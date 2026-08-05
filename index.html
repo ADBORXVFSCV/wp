@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp AI Commander Dashboard</title>
+    <meta name="description" content="Control center for your WhatsApp AI Automation Agent — manage contacts, groups, tasks, and chat directly with your Agent." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+    <div class="topbar-left">
+        <div class="logo-dot"></div>
+        <span class="logo-text">WhatsApp AI Agent</span>
+        <span class="status-badge" id="status-badge">● ACTIVE</span>
+    </div>
+    <nav class="topbar-nav">
+        <button class="nav-btn active" data-tab="chat-tab">💬 Commander Chat</button>
+        <button class="nav-btn" data-tab="personas-tab">👤 Contacts</button>
+        <button class="nav-btn" data-tab="groups-tab">👥 Groups</button>
+        <button class="nav-btn" data-tab="tasks-tab">📋 Task Queue</button>
+        <button class="nav-btn" data-tab="profile-tab">⚙️ Profile</button>
+    </nav>
+</header>
+
+<!-- ══════════════ COMMANDER CHAT TAB ══════════════ -->
+<section id="chat-tab" class="tab-content active">
+    <div class="chat-wrapper">
+        <div class="chat-sidebar">
+            <div class="sidebar-header">
+                <h3>Pending Questions</h3>
+                <span class="badge" id="questions-count">0</span>
+            </div>
+            <div id="questions-list" class="questions-list">
+                <p class="empty-state">No pending questions</p>
+            </div>
+
+            <div class="sidebar-divider"></div>
+
+            <div class="sidebar-header">
+                <h3>Assign Task</h3>
+            </div>
+            <div class="task-inject-form">
+                <input type="text" id="inject-identifier" placeholder="Contact or group name" />
+                <select id="inject-type">
+                    <option value="persona">Persona (Contact)</option>
+                    <option value="group">Group</option>
+                </select>
+                <input type="number" id="inject-priority" placeholder="Priority (1-5)" min="1" max="5" value="2" />
+                <textarea id="inject-instruction" placeholder="Instruction for agent..." rows="2"></textarea>
+                <button id="inject-task-btn" class="btn-primary">➕ Add Task</button>
+            </div>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="agent-avatar">🤖</div>
+                <div>
+                    <div class="agent-name">WhatsApp AI Agent</div>
+                    <div class="agent-status" id="agent-status">Ready</div>
+                </div>
+                <button class="btn-ghost small" id="clear-chat-btn" style="margin-left:auto">🗑 Clear</button>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg agent">
+                    <div class="msg-bubble">
+                        👋 Hello Commander! I'm your WhatsApp AI Agent. I'm actively managing your conversations.
+                        <br/><br/>
+                        You can tell me things like:<br/>
+                        • <em>"Ask John about the payment status"</em><br/>
+                        • <em>"Message the Sales Group with today's update"</em><br/>
+                        • <em>"What's happening with Sarah?"</em>
+                    </div>
+                    <div class="msg-time">System</div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <textarea id="chat-input" placeholder="Message your Agent... (Enter to send, Shift+Enter for new line)" rows="2"></textarea>
+                <button id="chat-send-btn" class="btn-primary">Send ➤</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════ CONTACTS TAB ══════════════ -->
+<section id="personas-tab" class="tab-content">
+    <div class="section-header">
+        <h2>Managed Contacts</h2>
+        <span class="badge" id="personas-count">0</span>
+    </div>
+    <div id="personas-list" class="card-grid">
+        <p class="empty-state">No contacts yet — they appear automatically when WhatsApp messages arrive.</p>
+    </div>
+</section>
+
+<!-- ══════════════ GROUPS TAB ══════════════ -->
+<section id="groups-tab" class="tab-content">
+    <div class="section-header">
+        <h2>Managed Groups</h2>
+        <span class="badge" id="groups-count">0</span>
+    </div>
+    <div id="groups-list" class="card-grid">
+        <p class="empty-state">No groups yet — they appear automatically when WhatsApp group messages arrive.</p>
+    </div>
+</section>
+
+<!-- ══════════════ TASK QUEUE TAB ══════════════ -->
+<section id="tasks-tab" class="tab-content">
+    <div class="section-header">
+        <h2>Active Task Queue</h2>
+        <button class="btn-primary small" id="refresh-tasks-btn">↻ Refresh</button>
+    </div>
+    <div id="tasks-list" class="tasks-list">
+        <p class="empty-state">Task queue is empty — the agent is idle.</p>
+    </div>
+</section>
+
+<!-- ══════════════ PROFILE TAB ══════════════ -->
+<section id="profile-tab" class="tab-content">
+    <div class="section-header">
+        <h2>Commander Profile & Agent Knowledge Base</h2>
+    </div>
+    <div class="profile-editor-card">
+        <p class="profile-hint">This file defines who you are, how the agent should behave, and everything the AI must know about you. Keep it updated — the agent reads this before every action.</p>
+        <textarea id="profile-textarea" rows="20" placeholder="Loading profile..."></textarea>
+        <div style="display:flex; gap: 12px; margin-top: 12px;">
+            <button class="btn-primary" id="save-profile-btn">💾 Save Profile</button>
+            <span id="profile-save-status" class="save-status"></span>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════ EDIT MODAL ══════════════ -->
+<div id="edit-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modal-title">Edit Record</h3>
+            <button id="close-modal-btn" class="btn-ghost">✕</button>
+        </div>
+        <form id="edit-form" class="edit-form">
+            <input type="hidden" id="edit-id" />
+            <input type="hidden" id="edit-type" />
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="edit-name" readonly />
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="text" id="edit-phone" placeholder="+1234567890" />
+            </div>
+            <div class="form-group">
+                <label>Personal Details</label>
+                <textarea id="edit-personal-details" rows="3" placeholder="What you know about this person..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>AI Thoughts (Memory)</label>
+                <textarea id="edit-ai-thoughts" rows="4" placeholder="Agent's internal memory about this chat..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>📩 Unread Notes for You (Commander)</label>
+                <textarea id="edit-unread-notes" rows="3" placeholder="Unread alerts from the agent..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>✅ Seen Notes</label>
+                <textarea id="edit-seen-notes" rows="3" placeholder="Already-seen notes..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>❓ Questions to You</label>
+                <textarea id="edit-questions" rows="3" placeholder="Questions the agent is asking you..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>🧭 Direction of Communication</label>
+                <textarea id="edit-direction" rows="2" placeholder="Current state of this conversation..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>📜 User Rules (Standing Instructions)</label>
+                <textarea id="edit-user-rules" rows="3" placeholder="Permanent rules for how to handle this contact/group..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; margin-top: 8px;">
+                <button type="submit" class="btn-primary">💾 Save Changes</button>
+                <button type="button" id="cancel-edit-btn" class="btn-ghost">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
